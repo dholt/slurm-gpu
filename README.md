@@ -23,6 +23,7 @@ p100     up   infinite         4/9/3/16  node[212-213,215-218,220-229]
 Partition configuration via Slurm configuration file `slurm.conf`:
 
 ```console
+NodeName=node[212-213,215-218,220-229]
 PartitionName=p100 Default=NO DefaultTime=01:00:00 State=UP Nodes=node[212-213,215-218,220-229]
 ```
 
@@ -73,7 +74,7 @@ On Ubuntu systems this is configurable via `/etc/default/grub`
 > GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
 
 
-## Building Slurm packages from source for Ubuntu
+## Building newer versions of Slurm from source as .deb packages for Ubuntu
 
 ### Install dependencies
 
