@@ -8,7 +8,61 @@ Slurm overview: https://slurm.schedmd.com/overview.html
 
 ## GPU resource scheduling in Slurm
 
-Slurm supports scheduling GPUs as a consumable resource 
+### Simple GPU scheduling with exclusive node access
+
+Slurm supports scheduling GPUs as a consumable resource just like memory and disk. If you're not interested in allowing multiple jobs per compute node, you many not nessesarily need to make Slurm aware of the GPUs in the system, and the configuration can be greatly simplified.
+
+One way of scheduling GPUs without making use of GRES (Generic REsource Scheduling) is to create partitions or queues for logical groups of GPUs. For example, grouping nodes with P100 GPUs into a P100 partition:
+
+```console
+$ sinfo -s
+PARTITION AVAIL  TIMELIMIT   NODES(A/I/O/T)  NODELIST
+p100     up   infinite         4/9/3/16  node[212-213,215-218,220-229]
+```
+
+Partition configuration via Slurm configuration file `slurm.conf`:
+
+```console
+PartitionName=p100 Default=NO DefaultTime=01:00:00 State=UP Nodes=node[212-213,215-218,220-229]
+```
+
+### Scheduling resources at the per GPU level
+
+Slurm can be made aware of GPUs as a consumable resource to allow jobs to request any number of GPUs.
+
+`slurm.conf`:
+
+```console
+# General
+ProctrackType=proctrack/cgroup
+TaskPlugin=task/cgroup
+
+# Scheduling
+SelectType=select/cons_res
+SelectTypeParameters=CR_Core_Memory
+
+# Logging and Accounting
+AccountingStorageTRES=gres/gpu
+DebugFlags=CPU_Bind,gres                # show detailed information in Slurm logs about GPU binding and affinity
+JobAcctGatherType=jobacct_gather/cgroup
+
+# Partitions
+GresTypes=gpu
+NodeName=slurm-node-0[0-1] Gres=gpu:2 CPUs=10 Sockets=1 CoresPerSocket=10 ThreadsPerCore=1 RealMemory=30000 State=UNKNOWN
+PartitionName=compute Nodes=ALL Default=YES MaxTime=48:00:00 DefaultTime=04:00:00 MaxNodes=2 State=UP DefMemPerCPU=3000
+```
+
+`cgroup.conf`:
+
+```console
+CgroupAutomount=yes 
+CgroupReleaseAgentDir="/etc/slurm/cgroup" 
+
+ConstrainCores=yes 
+ConstrainDevices=yes
+ConstrainRAMSpace=yes
+#TaskAffinity=yes
+```
 
 ### Kernel configuration
 
