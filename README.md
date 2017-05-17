@@ -50,7 +50,11 @@ SelectTypeParameters=CR_Core_Memory
 AccountingStorageTRES=gres/gpu
 DebugFlags=CPU_Bind,gres                # show detailed information in Slurm logs about GPU binding and affinity
 JobAcctGatherType=jobacct_gather/cgroup
+```
 
+Partition information in `slurm.conf` defines the available GPUs for each resource:
+
+```console
 # Partitions
 GresTypes=gpu
 NodeName=slurm-node-0[0-1] Gres=gpu:2 CPUs=10 Sockets=1 CoresPerSocket=10 ThreadsPerCore=1 RealMemory=30000 State=UNKNOWN
@@ -79,6 +83,13 @@ GPU resource scheduling requires a configuration file to define the available GP
 Name=gpu File=/dev/nvidia0 CPUs=0-4
 Name=gpu File=/dev/nvidia1 CPUs=5-9
 ```
+
+Running jobs utilizing GPU resources requires the `--gres` flag; for example, to run a job requiring a single GPU:
+
+```console
+$ srun --gres=gpu:1 nvidia-smi
+```
+
 ### Kernel configuration
 
 Using memory cgroups to restrict jobs to allocated memory resources requires setting kernel parameters
