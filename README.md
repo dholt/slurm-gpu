@@ -31,6 +31,10 @@ PartitionName=p100 Default=NO DefaultTime=01:00:00 State=UP Nodes=node[212-213,2
 
 Slurm can be made aware of GPUs as a consumable resource to allow jobs to request any number of GPUs.
 
+This feature requires job accounting to be enabled first; for more info, see: https://slurm.schedmd.com/accounting.html
+
+The Slurm configuration file needs parameters set to enable cgroups for resource management and GPU resource scheduling:
+
 `slurm.conf`:
 
 ```console
@@ -53,6 +57,8 @@ NodeName=slurm-node-0[0-1] Gres=gpu:2 CPUs=10 Sockets=1 CoresPerSocket=10 Thread
 PartitionName=compute Nodes=ALL Default=YES MaxTime=48:00:00 DefaultTime=04:00:00 MaxNodes=2 State=UP DefMemPerCPU=3000
 ```
 
+Cgroups require a seperate configuration file:
+
 `cgroup.conf`:
 
 ```console
@@ -65,6 +71,14 @@ ConstrainRAMSpace=yes
 #TaskAffinity=yes
 ```
 
+GPU resource scheduling requires a configuration file to define the available GPUs and their CPU affinity
+
+`gres.conf`:
+
+```console
+Name=gpu File=/dev/nvidia0 CPUs=0-4
+Name=gpu File=/dev/nvidia1 CPUs=5-9
+```
 ### Kernel configuration
 
 Using memory cgroups to restrict jobs to allocated memory resources requires setting kernel parameters
