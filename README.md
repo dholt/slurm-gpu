@@ -134,6 +134,7 @@ make -j install
 cd
 fpm -s dir -t deb -v 1.0 -n slurm-17.02.5 --prefix=/usr -C /tmp/slurm-build .
 dpkg --contents slurm-17.02.5_1.0_amd64.deb
+```
 
 ## Build with docker
 
