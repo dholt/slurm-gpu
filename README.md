@@ -118,8 +118,8 @@ sudo gem install fpm
 ### Configure and build Slurm
 
 ```console
-wget http://www.schedmd.com/downloads/latest/slurm-17.02.1-2.tar.bz2
-tar xvjf slurm-17.02.1-2.tar.bz2
+wget http://www.schedmd.com/downloads/latest/slurm-17.02.5.tar.bz2
+tar xvjf slurm-17.02.5.tar.bz2
 ./configure --prefix=/tmp/slurm-build --sysconfdir=/etc/slurm
 make -j
 make -j contrib
@@ -132,6 +132,10 @@ make -j install
 
 ```console
 cd
-fpm -s dir -t deb -v 1.0 -n slurm-17.02.1-2 --prefix=/usr -C /tmp/slurm-build .
-dpkg --contents slurm-17.02.1-2_1.0_amd64.deb
+fpm -s dir -t deb -v 1.0 -n slurm-17.02.5 --prefix=/usr -C /tmp/slurm-build .
+dpkg --contents slurm-17.02.5_1.0_amd64.deb
+
+## Build with docker
+```
+make`
 ```
