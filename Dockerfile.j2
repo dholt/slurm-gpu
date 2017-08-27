@@ -7,10 +7,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN gem install fpm
 
-ARG SLURM_VERSION=17.02.5
-ARG APT_VERSION=1.0
+ARG SLURM_VERSION
+ARG APT_VERSION
 
-RUN wget http://www.schedmd.com/downloads/latest/slurm-$SLURM_VERSION.tar.bz2 \
+RUN wget https://www.schedmd.com/downloads/latest/slurm-$SLURM_VERSION.tar.bz2 \
  && tar xvjf slurm-$SLURM_VERSION.tar.bz2 \
  && rm -f slurm-$SLURM_VERSION.tar.bz2 \
  && cd slurm-$SLURM_VERSION \
@@ -19,5 +19,13 @@ RUN wget http://www.schedmd.com/downloads/latest/slurm-$SLURM_VERSION.tar.bz2 \
  && make -j contrib \
  && make -j install 
 
-RUN fpm -s dir -t deb -v $APT_VERSION -n slurm-${SLURM_VERSION} --prefix=/usr -C /tmp/slurm-build . \
- && dpkg --contents slurm-${SLURM_VERSION}_${APT_VERSION}_amd64.deb
+COPY ./generate_dependencies.sh /tmp/
+RUN /tmp/generate_dependencies.sh 2>/dev/null
+# Create Depends list
+# for each directory in bin, lib, sbin run the following:
+# objdump -p ./* | grep NEEDED | tr -s ' ' | cut -d ' ' -f3 | sort | uniq | xargs -n1 dpkg -S | cut -d ' ' -f 1 | sort | uniq | tr ':' ' ' | cut -d ' ' -f 1 >> /tmp/depends
+
+RUN fpm -s dir -t deb -n slurm -v ${SLURM_VERSION} --iteration ${APT_VERSION} --prefix=/usr -C /tmp/slurm-build \
+        $(for pkg in $(cat /tmp/slurm-packages); do echo --depends $pkg; done) \
+        . 
+# && dpkg --contents slurm_${SLURM_VERSION}-${APT_VERSION}_amd64.deb
