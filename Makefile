@@ -13,7 +13,7 @@ endif
 
 .PHONY: build tag push release clean distclean
 
-default: clean build clean
+default: clean copy
 
 build: 
 	echo FROM ${BASE_IMAGE} > Dockerfile
