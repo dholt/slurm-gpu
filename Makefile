@@ -3,7 +3,7 @@ IMAGE_NAME ?= build-slurm
 RELEASE_IMAGE ?= nvcr.io/nvidian_sas/build-slurm
 
 SLURM_VERSION=17.02.7
-APT_VERSION=1
+APT_VERSION=2
 
 ifdef DOCKER_APT_PROXY
   CACHES = --build-arg APT_PROXY_PORT=${DOCKER_APT_PROXY}
@@ -20,7 +20,7 @@ build:
 	cat Dockerfile.j2 >> Dockerfile
 	docker build ${CACHES} --build-arg SLURM_VERSION=${SLURM_VERSION} --build-arg APT_VERSION=${APT_VERSION} -t ${IMAGE_NAME} . 
 
-copy:
+copy: build
 	docker run --rm -ti -v ${PWD}:/out ${IMAGE_NAME} cp slurm_${SLURM_VERSION}-${APT_VERSION}_amd64.deb /out
 
 dev: build
