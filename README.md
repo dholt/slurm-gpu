@@ -140,4 +140,5 @@ dpkg --contents slurm-17.02.5_1.0_amd64.deb
 
 ```
 make
+dpkg-deb -I *.deb
 ```
