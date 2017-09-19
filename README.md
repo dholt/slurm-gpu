@@ -118,8 +118,9 @@ sudo gem install fpm
 ### Configure and build Slurm
 
 ```console
-wget http://www.schedmd.com/downloads/latest/slurm-17.02.5.tar.bz2
-tar xvjf slurm-17.02.5.tar.bz2
+export SLURM_VERSION=17.02.7
+wget http://www.schedmd.com/downloads/latest/slurm-${SLURM_VERSION}.tar.bz2
+tar xvjf slurm-${SLURM_VERSION}.tar.bz2
 ./configure --prefix=/tmp/slurm-build --sysconfdir=/etc/slurm
 make -j
 make -j contrib
@@ -128,17 +129,22 @@ make -j install
 
 ### Package Slurm install directory as a Debian package using FPM
 
-> Modify version via `-v` flag when building new versions so that APT will detect updated packages
+> Modify version via `-v` flag for source version changes, and `--iteration` flag build version cahnges so that APT will detect updated packages
 
 ```console
-cd
-fpm -s dir -t deb -v 1.0 -n slurm-17.02.5 --prefix=/usr -C /tmp/slurm-build .
-dpkg --contents slurm-17.02.5_1.0_amd64.deb
+cd ~
+export BUILD_ITERATION=1
+fpm -s dir -t deb -v ${SLURM_VERSION} --iteration ${BUILD_ITERATION} -n slurm --prefix=/usr -C /tmp/slurm-build .
+dpkg --contents slurm_${SLURM_VERSION}_${BUILD_ITERATION}_amd64.deb
 ```
 
-## Build with docker
+## Build with docker (preferred method)
 
+> Assumes `docker` is already installed.
+Make necessary version string changes in `Makefile`, then:
 ```
+git clone https://github.com/dholt/slurm-gpu
 make
-dpkg-deb -I *.deb
 ```
+A nicely packaged `slurm_17.02.7_1.deb` should now exist in the same directory.
+Inspect the contents using `dpkg --contents slurm_17.02.7_1.deb`**
