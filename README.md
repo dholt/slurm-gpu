@@ -141,10 +141,11 @@ dpkg --contents slurm_${SLURM_VERSION}_${BUILD_ITERATION}_amd64.deb
 ## Build with docker (preferred method)
 
 > Assumes `docker` is already installed.
+
 Make necessary version string changes in `Makefile`, then:
 ```
 git clone https://github.com/dholt/slurm-gpu
 make
 ```
 A nicely packaged `slurm_17.02.7_1.deb` should now exist in the same directory.
-Inspect the contents using `dpkg --contents slurm_17.02.7_1.deb`**
+Inspect the contents using `dpkg --contents slurm_17.02.7_1.deb`
