@@ -129,23 +129,30 @@ make -j install
 
 ### Package Slurm install directory as a Debian package using FPM
 
-> Modify version via `-v` flag for source version changes, and `--iteration` flag build version cahnges so that APT will detect updated packages
+> Modify version via `-v` flag for source version changes, and `--iteration` flag for build version cahnges so that APT will detect updated packages
 
 ```console
-cd ~
 export BUILD_ITERATION=1
 fpm -s dir -t deb -v ${SLURM_VERSION} --iteration ${BUILD_ITERATION} -n slurm --prefix=/usr -C /tmp/slurm-build .
-dpkg --contents slurm_${SLURM_VERSION}_${BUILD_ITERATION}_amd64.deb
+```
+A deb package such as `slurm_17.02.7-2_amd64.deb` has been created in the same directory. You may inspect its contents using:
+```console
+dpkg --contents slurm_${SLURM_VERSION}-${BUILD_ITERATION}_amd64.deb
 ```
 
 ## Build with docker (preferred method)
 
 > Assumes `docker` is already installed.
 
-Make necessary version string changes in `Makefile`, then:
-```
+The Dockerfile and Makefile provided in this repo wraps the above build-and-package-as-deb steps into a containerized workflow.
+The deb package also copies the customary `copyright` license file from the source archive to the appropriate `/usr/share/doc` location.
+
+If you need to update the Slurm source version, make necessary version string changes in `Makefile` prior to the `make` step:
+
+```console
 git clone https://github.com/dholt/slurm-gpu
+cd slurm-gpu/
 make
 ```
-A nicely packaged `slurm_17.02.7_1.deb` should now exist in the same directory.
-Inspect the contents using `dpkg --contents slurm_17.02.7_1.deb`
+A nicely packaged `slurm_17.02.7-2_amd64.deb` should now exist in the same directory.
+Inspect the contents using `dpkg --contents slurm_17.02.7-2_amd64.deb`
