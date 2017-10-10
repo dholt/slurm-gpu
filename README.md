@@ -98,6 +98,9 @@ On Ubuntu systems this is configurable via `/etc/default/grub`
 
 > GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
 
+## Step-by-step instructions
+
+See: https://github.com/mknoxnv/ubuntu-slurm
 
 ## Building newer versions of Slurm from source as .deb packages for Ubuntu
 
