@@ -19,7 +19,7 @@ RUN wget https://www.schedmd.com/downloads/latest/slurm-$SLURM_VERSION.tar.bz2 \
  && make -j contrib \
  && make -j install 
 
-RUN cp /slurm-$SLURM_VERSION/contribs/pam/.libs/pam_slurm.so /tmp/slurm-build/libs
+RUN cp /slurm-$SLURM_VERSION/contribs/pam/.libs/pam_slurm.so /tmp/slurm-build/lib
 
 COPY ./generate_dependencies.sh /tmp/
 RUN /tmp/generate_dependencies.sh 2>/dev/null
