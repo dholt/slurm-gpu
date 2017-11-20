@@ -2,7 +2,7 @@ BASE_IMAGE ?= ubuntu:16.04
 IMAGE_NAME ?= build-slurm
 RELEASE_IMAGE ?= nvcr.io/nvidian_sas/build-slurm
 
-SLURM_VERSION=17.02.7
+SLURM_VERSION=17.02.9
 APT_VERSION=2
 
 ifdef DOCKER_APT_PROXY
@@ -15,12 +15,14 @@ endif
 
 default: clean copy
 
-build: 
-	echo FROM ${BASE_IMAGE} > Dockerfile
-	cat Dockerfile.j2 >> Dockerfile
-	docker build ${CACHES} --build-arg SLURM_VERSION=${SLURM_VERSION} --build-arg APT_VERSION=${APT_VERSION} -t ${IMAGE_NAME} . 
+.Dockerfile: Dockerfile
+	echo FROM ${BASE_IMAGE} > .Dockerfile
+	cat Dockerfile >> .Dockerfile
 
-copy: build
+build: .Dockerfile
+	docker build ${CACHES} --build-arg SLURM_VERSION=${SLURM_VERSION} --build-arg APT_VERSION=${APT_VERSION} -f .Dockerfile -t ${IMAGE_NAME} . 
+
+copy: build 
 	docker run --rm -ti -v ${PWD}:/out ${IMAGE_NAME} cp slurm_${SLURM_VERSION}-${APT_VERSION}_amd64.deb /out
 
 dev: build
@@ -36,7 +38,7 @@ push: tag
 release: push
 
 clean:
-	@rm -f Dockerfile 2> /dev/null ||:
+	@rm -f .Dockerfile 2> /dev/null ||:
 	@docker rm -v `docker ps -a -q -f "status=exited"` 2> /dev/null ||:
 	@docker rmi `docker images -q -f "dangling=true"` 2> /dev/null ||:
 
