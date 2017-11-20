@@ -27,8 +27,14 @@ RUN /tmp/generate_dependencies.sh 2>/dev/null
 # for each directory in bin, lib, sbin run the following:
 # objdump -p ./* | grep NEEDED | tr -s ' ' | cut -d ' ' -f3 | sort | uniq | xargs -n1 dpkg -S | cut -d ' ' -f 1 | sort | uniq | tr ':' ' ' | cut -d ' ' -f 1 >> /tmp/depends
 
-RUN mkdir /tmp/slurm-build/share/doc/slurm/ \
+RUN mkdir -p /tmp/slurm-build/share/doc/slurm/ \
  && cp /slurm-$SLURM_VERSION/COPYING /tmp/slurm-build/share/doc/slurm/copyright
+
+RUN mkdir -p /tmp/slurm-build/share/pkgconfig \
+ && mkdir -p /tmp/slurm-build/lib/pkgconfig 
+
+COPY slurm.pc /tmp/slurm-build/share/pkgconfig/slurm.pc
+COPY slurm.pc /tmp/slurm-build/lib/pkgconfig/slurm.pc
 
 RUN fpm -s dir -t deb -n slurm -v ${SLURM_VERSION} --iteration ${APT_VERSION} --prefix=/usr -C /tmp/slurm-build \
         $(for pkg in $(cat /tmp/slurm-packages); do echo --depends $pkg; done) . 
