@@ -90,6 +90,12 @@ Running jobs utilizing GPU resources requires the `--gres` flag; for example, to
 $ srun --gres=gpu:1 nvidia-smi
 ```
 
+In order to enforce proper CPU:GPU affinity (i.e. for performance reasons), use the flag `--gres-flags=enforce-binding`
+
+> --gres-flags=enforce-binding
+If set, the only CPUs available to the job will be those bound to the selected GRES (i.e. the CPUs identified in the gres.conf file will be strictly enforced rather than advisory). This option may result in delayed initiation of a job. For example a job requiring two GPUs and one CPU will be delayed until both GPUs on a single socket are available rather than using GPUs bound to separate sockets, however the application performance may be improved due to improved communication speed. Requires the node to be configured with more than one socket and resource filtering will be performed on a per-socket basis. This option applies to job allocations.
+
+
 ### Kernel configuration
 
 Using memory cgroups to restrict jobs to allocated memory resources requires setting kernel parameters
