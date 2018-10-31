@@ -108,12 +108,25 @@ On Ubuntu systems this is configurable via `/etc/default/grub`
 
 See: https://github.com/mknoxnv/ubuntu-slurm
 
-## Building newer versions of Slurm from source as .deb packages for Ubuntu
+## Building newer versions of Slurm from source as .deb packages for Ubuntu or .rpm for Centos
 
 ### Install dependencies
 
+#### Ubuntu
+
 ```console
 sudo apt-get install build-essential ruby-dev libpam0g-dev libmysqlclient-dev libmunge-dev libmysqld-dev
+```
+
+#### Centos
+
+```console
+sudo yum groupinstall -y "Development Tools"
+sudo yum install -y bzip2 wget ruby-devel libmunge-devel pam-devel perl-devel
+wget https://repo.mysql.com//mysql80-community-release-el7-1.noarch.rpm && \
+    sudo rpm -i mysql80-community-release-el7-1.noarch.rpm && \
+    sudo yum install -y mysql-community-devel && \
+    rm mysql80-community-release-el7-1.noarch.rpm 
 ```
 
 ### Install FPM packaging tool
@@ -127,7 +140,7 @@ sudo gem install fpm
 ### Configure and build Slurm
 
 ```console
-export SLURM_VERSION=17.02.7
+export SLURM_VERSION=17.11.12
 wget http://www.schedmd.com/downloads/latest/slurm-${SLURM_VERSION}.tar.bz2
 tar xvjf slurm-${SLURM_VERSION}.tar.bz2
 ./configure --prefix=/tmp/slurm-build --sysconfdir=/etc/slurm
@@ -144,7 +157,7 @@ make -j install
 export BUILD_ITERATION=1
 fpm -s dir -t deb -v ${SLURM_VERSION} --iteration ${BUILD_ITERATION} -n slurm --prefix=/usr -C /tmp/slurm-build .
 ```
-A deb package such as `slurm_17.02.7-2_amd64.deb` has been created in the same directory. You may inspect its contents using:
+A deb package such as `slurm_17.11.12-2_amd64.deb` has been created in the same directory. You may inspect its contents using:
 ```console
 dpkg --contents slurm_${SLURM_VERSION}-${BUILD_ITERATION}_amd64.deb
 ```
@@ -158,10 +171,15 @@ The deb package also copies the customary `copyright` license file from the sour
 
 If you need to update the Slurm source version, make necessary version string changes in `Makefile` prior to the `make` step:
 
+
 ```console
 git clone https://github.com/dholt/slurm-gpu
 cd slurm-gpu/
-make
+make BUILD_DISTRO=ubuntu # For Centos, use BUILD_DISTRO=centos
 ```
-A nicely packaged `slurm_17.02.7-2_amd64.deb` should now exist in the same directory.
-Inspect the contents using `dpkg --contents slurm_17.02.7-2_amd64.deb`
+
+For Ubuntu, a nicely packaged `slurm_17.11.12-2_amd64.deb` should now exist in the same directory.
+Inspect the contents using `dpkg --contents slurm_17.11.12-2_amd64.deb`
+
+For Centos, a nicely packaged `slurm-17.11.12-2.x86_64.rpm` should now exist in the same directory.
+Inspect the contents using `rpm -qlp slurm-17.11.12-2.x86_64.rpm`
