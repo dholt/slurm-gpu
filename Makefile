@@ -1,33 +1,43 @@
-BASE_IMAGE ?= ubuntu:16.04
-IMAGE_NAME ?= build-slurm
-RELEASE_IMAGE ?= nvcr.io/nvidian_sas/build-slurm
-
-SLURM_VERSION=17.02.9
-APT_VERSION=2
+PKG_VERSION ?= 2
 
 ifdef DOCKER_APT_PROXY
   CACHES = --build-arg APT_PROXY_PORT=${DOCKER_APT_PROXY}
 else
   CACHES =
 endif
-
+       
 .PHONY: build tag push release clean distclean
 
 default: clean copy
 
-.Dockerfile: Dockerfile
-	echo FROM ${BASE_IMAGE} > .Dockerfile
-	cat Dockerfile >> .Dockerfile
+BUILD_DISTRO ?= ubuntu
+ifeq ($(BUILD_DISTRO), ubuntu)
+        BASE_IMAGE := ubuntu:16.04
+        IMAGE_NAME := build-slurm:ubuntu-16.04
+        FILE_EXT = :_amd64.deb
+        FILE_PRE = :_
+endif 
+ifeq ($(BUILD_DISTRO), centos)
+        BASE_IMAGE := centos:7
+        IMAGE_NAME := build-slurm:centos-7
+        FILE_EXT := .x86_64.rpm
+        FILE_PRE := -
+endif 
+
+RELEASE_IMAGE ?= nvcr.io/nvidian_sas/${IMAGE_NAME}
+
+.Dockerfile:
+	echo FROM $(BASE_IMAGE) > .Dockerfile
+	cat Dockerfile.$(BUILD_DISTRO) >> .Dockerfile
 
 build: .Dockerfile
-	docker build ${CACHES} --build-arg SLURM_VERSION=${SLURM_VERSION} --build-arg APT_VERSION=${APT_VERSION} -f .Dockerfile -t ${IMAGE_NAME} . 
+	docker build ${CACHES} --build-arg SLURM_VERSION=${SLURM_VERSION} --build-arg PKG_VERSION=${PKG_VERSION} -f .Dockerfile -t ${IMAGE_NAME} . 
 
 copy: build 
-	docker run --rm -ti -v ${PWD}:/out ${IMAGE_NAME} cp slurm_${SLURM_VERSION}-${APT_VERSION}_amd64.deb /out
+	docker run --rm -ti -v ${PWD}:/out ${IMAGE_NAME} cp /tmp/slurm-build/slurm${FILE_PRE}${SLURM_VERSION}-${PKG_VERSION}${FILE_EXT} /out
 
 dev: build
 	docker run --rm -ti -v ${PWD}:/out ${IMAGE_NAME} bash
-
 
 tag: build
 	docker tag ${IMAGE_NAME} ${RELEASE_IMAGE}
@@ -45,3 +55,5 @@ clean:
 distclean: clean
 	@docker rmi ${IMAGE_NAME} 2> /dev/null ||:
 	@docker rmi ${RELEASE_IMAGE} 2> /dev/null ||:
+
+
