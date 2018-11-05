@@ -26,8 +26,8 @@ RUN cd /slurm-$SLURM_VERSION \
 
 RUN cp /slurm-$SLURM_VERSION/contribs/pam/.libs/pam_slurm.so /tmp/slurm-build/lib
 
-RUN mkdir -p /tmp/slurm-build/share/doc/slurm/ \
- && cp /slurm-$SLURM_VERSION/COPYING /tmp/slurm-build/share/doc/slurm/copyright
+COPY slurm.pc /tmp/slurm-build/share/pkgconfig/slurm.pc
+COPY slurm.pc /tmp/slurm-build/lib/pkgconfig/slurm.pc
 
 RUN mkdir -p /tmp/slurm-build/share/pkgconfig \
  && mkdir -p /tmp/slurm-build/lib/pkgconfig 
