@@ -105,7 +105,6 @@ On Ubuntu systems this is configurable via `/etc/default/grub`
 > GRUB_CMDLINE_LINUX="cgroup_enable=memory swapaccount=1"
 
 ## Step-by-step instructions
-
 See: https://github.com/mknoxnv/ubuntu-slurm
 
 ## Building newer versions of Slurm from source as .deb packages for Ubuntu or .rpm for Centos
@@ -170,7 +169,6 @@ The Dockerfile and Makefile provided in this repo wraps the above build-and-pack
 The deb package also copies the customary `copyright` license file from the source archive to the appropriate `/usr/share/doc` location.
 
 If you need to update the Slurm source version, make necessary version string changes in `Makefile` prior to the `make` step:
-
 
 ```console
 git clone https://github.com/dholt/slurm-gpu
