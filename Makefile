@@ -14,8 +14,8 @@ BUILD_DISTRO ?= ubuntu
 ifeq ($(BUILD_DISTRO), ubuntu)
         BASE_IMAGE := ubuntu:16.04
         IMAGE_NAME := build-slurm:ubuntu-16.04
-        FILE_EXT = :_amd64.deb
-        FILE_PRE = :_
+        FILE_EXT := _amd64.deb
+        FILE_PRE := _
 endif 
 ifeq ($(BUILD_DISTRO), centos)
         BASE_IMAGE := centos:7
